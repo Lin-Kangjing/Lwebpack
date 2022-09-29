@@ -1,8 +1,18 @@
+/*
+ * @Description: 
+ * @FilePath: \Lwebpack\core\webpack.js
+ * @Date: 2022-09-28 17:01:51
+ * @LastEditors: Lin_kangjing
+ * @LastEditTime: 2022-09-29 16:27:10
+ * @author: Lin_kangjing
+ */
 function webpack (options) {
   // merge parameter 
   const mergeOptions = _mergeOptions(options)
   // create a compiler object
   const compiler = new Compiler(mergeOptions)
+  // load the plugin
+  _loadPlugin(options.plugins,compiler)
   return compiler
 }
 
@@ -23,5 +33,20 @@ function _mergeOptions (options) {
     return options
   },{})
   return {...options,...shellOptions}
+}
+/**
+ * @description: load the plugin function
+ * @param {*} plugins
+ * @param {*} compiler
+ * @return {*}
+ * @author: Lin_kangjing
+ */
+function _loadPlugin (plugins,compiler) {
+  if(plugins && Array.isArray(plugins)){
+    plugins.forEach(plugin=>{
+      plugin.apply(compiler)
+    })
+  }
+  
 }
 module.exports = webpack
