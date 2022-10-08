@@ -75,7 +75,7 @@ class Compiler {
       // 目前我们外部仅支持传入绝对路径的loader模式
       // require引入对应loader
       const loaderFn = require(matchLoaders[i]);
-      通过loader同步处理我的每一次编译的moduleCode
+      // 通过loader同步处理我的每一次编译的moduleCode
       this.moduleCode = loaderFn(this.moduleCode)
     }
   }
