@@ -1,15 +1,19 @@
 /*
- * @Description:
+ * @Description: 
  * @FilePath: \Lwebpack\core\compiler.js
  * @Date: 2022-09-29 15:59:53
  * @LastEditors: Lin_kangjing
- * @LastEditTime: 2022-10-08 16:31:30
+ * @LastEditTime: 2022-10-10 15:34:21
  * @author: Lin_kangjing
  */
 const fs = require("fs");
 const path = require("path");
+const parser = require('@babel/parser');
+const traverse = require('@babel/traverse').default;
+const generator = require('@babel/generator').default;
+const t = require('@babel/types');
 const { SyncHook } = require("tapable");
-const { toUnixPath } = require("./utils");
+const { toUnixPath,tryExtensions } = require("./utils");
 class Compiler {
   constructor(options) {
     this.options = options;
@@ -79,9 +83,61 @@ class Compiler {
       this.moduleCode = loaderFn(this.moduleCode)
     }
   }
+  // call webpack for module compilation
+  handleWebpackCompiler(moduleName, modulePath){
+    // calculate the  relative path of the current module relative to the projet startup root directory as the module ID
+    const moduleId = './'+path.posix.relative(this.rootPath,modulePath)
+    // creating a module object
+    const module = {
+      id:moduleId,
+      // the absolute path address of the module on which the module depends
+      dependencies:new Set(),
+      //the entry file to which the module belongs
+      name:[moduleName]
+    }
+    // call babel to analyze the code
+    const ast = parser.parse(this.moduleCode,{
+      sourceType:'module'
+    })
+    // depth-first traversal of the syntax tree
+    traverse(ast,{
+      //when the require statement is encountered require('../path')
+      CallExpression:(nodePath)=>{
+        const node  = nodePath.node
+        if(node.callee.name === 'require'){
+          // gets the relative path of the introduced in the source code
+          const requirePath = node.arguments[0].value
+          // get the absolute path of module 当前模块路径+require()对应相对路径
+          const moduleDirName = path.posix.dirname(modulePath)
+          const absolutePath = tryExtensions(
+            path.posix.join(moduleDirName, requirePath),
+            this.options.resolve.extensions,
+            requirePath,
+            moduleDirName
+          )
+          // generate moduleId 
+          const moduleId = './'+path.posix.relative(this.rootPath,absolutePath)
+          // 'babel' changed 'require' in the source code to a '__webpack_require__'
+          node.callee = t.identifier('__webpack_require__');
+          // 修改源代码中require语句引入的模块 全部修改变为相对于跟路径来处理
+          node.arguments = [t.stringLiteral(moduleId)]
+          // add a depend for current module 
+          module.dependencies.add(moduleId)
+          
+        }
+      }
+    })
+    // generate new code
+    const {code} = generator(ast)
+    // mounts the new generate code for current module
+    module._source = code
+    return module
+
+
+  }
   // compiler module
   buildModule(moduleName, modulePath) {
-    // 1.read the origin code
+    // 1.read the source code
     const originSourceCode = (this.originSourceCode = fs.readFileSync(
       modulePath,
       "utf8"
@@ -90,7 +146,9 @@ class Compiler {
     this.moduleCode = originSourceCode;
     // 2.call loader for processing
     this.handleLoader(modulePath);
-    return {};
+    // 3.call webpack for module compilation,get the final module object
+    const module = this.handleWebpackCompiler(moduleName, modulePath)
+    return module;
   }
   // compiler the entry file
   buildEntryModule() {

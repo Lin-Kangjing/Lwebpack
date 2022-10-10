@@ -4,6 +4,30 @@
  * @return {*}
  * @author: Lin_kangjing
  */
-function toUnixPath (path) {
-  return path.replace(/\\/g,'/')
+module.exports.toUnixPath = function toUnixPath(path) {
+  return path.replace(/\\/g, "/");
+}
+
+
+/**
+ * @param {*} modulePath: module absolute path
+ * @param {*} extensions:extension name array
+ * @param {*} originModulePath:require module path
+ * @param {*} moduleContext:the directory where the current moudle resides
+ * @return {*}
+ * @author: Lin_kangjing
+ */
+ module.exports.tryExtensions =function tryExtensions(
+  modulePath,
+  extensions,
+  originModulePath,
+  moduleContext
+) {
+  extensions.unshift('')
+  for (const extension of extensions) {
+    if(fs.existsSync(modulePath + extension)) {
+      return modulePath+extension
+    }
+  }
+  throw new Error(`No module, Error:Can't resolve ${originModulePath} in ${moduleContext}`)
 }
