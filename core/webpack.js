@@ -3,9 +3,10 @@
  * @FilePath: \Lwebpack\core\webpack.js
  * @Date: 2022-09-28 17:01:51
  * @LastEditors: Lin_kangjing
- * @LastEditTime: 2022-09-29 16:27:10
+ * @LastEditTime: 2022-10-11 17:16:19
  * @author: Lin_kangjing
  */
+const Compiler = require('./compiler.js')
 function webpack (options) {
   // merge parameter 
   const mergeOptions = _mergeOptions(options)

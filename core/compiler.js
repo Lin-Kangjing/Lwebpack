@@ -3,7 +3,7 @@
  * @FilePath: \Lwebpack\core\compiler.js
  * @Date: 2022-09-29 15:59:53
  * @LastEditors: Lin_kangjing
- * @LastEditTime: 2022-10-10 15:34:21
+ * @LastEditTime: 2022-10-11 17:35:01
  * @author: Lin_kangjing
  */
 const fs = require("fs");
@@ -19,6 +19,7 @@ class Compiler {
     this.options = options;
     // root path
     this.rootPath = this.options.context || toUnixPath(process.cwd());
+    
     // create plugin hooks
     this.hooks = {
       // start the compilation hook
@@ -39,26 +40,10 @@ class Compiler {
     this.assets = new Set();
     // all file names of this compilation
     this.files = new Set();
+    console.log('------------------')
+    console.log('compiler init')
   }
 
-  // get the entry object of configuration
-  getEntry() {
-    let entry = Object.create(null);
-    const { entry: optionsEntry } = this.options;
-    if (typeof optionsEntry === "string") {
-      entry["main"] = optionsEntry;
-    } else {
-      entry = optionsEntry;
-    }
-    // change entry to an absolute path
-    Object.keys(entry).forEach((key) => {
-      const value = entry[key];
-      if (!path.isAbsolute(value)) {
-        entry[key] = toUnixPath(path.join(this.rootPath, value));
-      }
-    });
-    return entry;
-  }
   // matching loader processing
   handleLoader(modulePath) {
     const matchLoaders = [];
@@ -151,12 +136,32 @@ class Compiler {
     return module;
   }
   // compiler the entry file
-  buildEntryModule() {
+  buildEntryModule(entry) {
     Object.keys(entry).forEach((entryName) => {
       const entryPath = entry[entryName];
       const entryObj = this.buildModule(entryName, entryPath);
       this.entries.add(entryObj);
     });
+    console.log('entries',this.entries)
+  }
+  
+  // get the entry object of configuration
+  getEntry() {
+    let entry = Object.create(null);
+    const { entry: optionsEntry } = this.options;
+    if (typeof optionsEntry === "string") {
+      entry["main"] = optionsEntry;
+    } else {
+      entry = optionsEntry;
+    }
+    // change entry to an absolute path
+    Object.keys(entry).forEach((key) => {
+      const value = entry[key];
+      if (!path.isAbsolute(value)) {
+        entry[key] = toUnixPath(path.join(this.rootPath, value));
+      }
+    });
+    return entry;
   }
   // start the compilation
   run(callback) {

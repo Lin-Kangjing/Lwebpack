@@ -1,3 +1,12 @@
+/*
+ * @Description: 
+ * @FilePath: \Lwebpack\core\utils\index.js
+ * @Date: 2022-09-30 11:22:39
+ * @LastEditors: Lin_kangjing
+ * @LastEditTime: 2022-10-11 17:38:25
+ * @author: Lin_kangjing
+ */
+const fs = require('fs');
 /**
  * @description:统一路径分隔符 主要是为了后续生成模块ID方便
  *  uniform path separator,it is mainly for the  convenience of generating the module ID later
