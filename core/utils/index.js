@@ -3,7 +3,7 @@
  * @FilePath: \Lwebpack\core\utils\index.js
  * @Date: 2022-09-30 11:22:39
  * @LastEditors: Lin_kangjing
- * @LastEditTime: 2022-10-11 17:38:25
+ * @LastEditTime: 2022-10-12 16:10:47
  * @author: Lin_kangjing
  */
 const fs = require('fs');
@@ -14,7 +14,7 @@ const fs = require('fs');
  * @author: Lin_kangjing
  */
 module.exports.toUnixPath = function toUnixPath(path) {
-  return path.replace(/\\/g, "/");
+  return path.replace(/\\/g, '/');
 }
 
 

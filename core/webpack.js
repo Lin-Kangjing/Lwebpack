@@ -3,7 +3,7 @@
  * @FilePath: \Lwebpack\core\webpack.js
  * @Date: 2022-09-28 17:01:51
  * @LastEditors: Lin_kangjing
- * @LastEditTime: 2022-10-11 17:16:19
+ * @LastEditTime: 2022-10-12 14:20:38
  * @author: Lin_kangjing
  */
 const Compiler = require('./compiler.js')
@@ -12,6 +12,7 @@ function webpack (options) {
   const mergeOptions = _mergeOptions(options)
   // create a compiler object
   const compiler = new Compiler(mergeOptions)
+  console.log('generate compiler------------')
   // load the plugin
   _loadPlugin(options.plugins,compiler)
   return compiler
