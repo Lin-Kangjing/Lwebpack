@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@antv/g6": "3.0.0",
     "@babel/generator": "^7.19.5",
     "@babel/parser": "^7.19.4",
     "@babel/traverse": "^7.19.4",

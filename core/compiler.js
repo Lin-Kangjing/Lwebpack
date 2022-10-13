@@ -3,7 +3,7 @@
  * @FilePath: \Lwebpack\core\compiler.js
  * @Date: 2022-09-29 15:59:53
  * @LastEditors: Lin_kangjing
- * @LastEditTime: 2022-10-13 11:43:03
+ * @LastEditTime: 2022-10-13 15:47:04
  * @author: Lin_kangjing
  */
 const fs = require("fs");
@@ -199,7 +199,21 @@ class Compiler {
   }
   // 导出chunk问文件
   exportFile(){
-
+    const output = this.options.output
+    // generate assets by chunks
+    this.chunks.forEach(chink=>{
+      const parseFileName = output.filename.replace('[name]',chunk.name)
+      // assets中 { 'main.js': '生成的字符串代码...' }
+      this.assets[parseFileName] = getSourceCode(chunk)
+    })
+    this.hooks.emit.call()
+    // create output directory
+    if(!fs.existsSync(output.path)){ 
+      fs.mkdirSync(output.path)
+    }
+    // save all generated file names in 'files' 
+    this.files = Object.keys(this.assets)
+    // 将'assets'中的内容生成打包文件 写入文件系统中
   }
   // start the compilation
   run(callback) {
